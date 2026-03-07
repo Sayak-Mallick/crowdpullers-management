@@ -4,7 +4,7 @@ import { config } from "./config";
 const connectDB = async () => {
   try {
     mongoose.connection.on("connected", () => {
-      console.log("✅ Connected to MongoDB successfully!");
+      console.log(`✅ Connected to ${config.DB_NAME} successfully!`);
     });
 
     mongoose.connection.on("error", (err) => {
