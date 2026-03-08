@@ -70,7 +70,6 @@ const creatClient = async (req: Request, res: Response, next: NextFunction) => {
       message: "Client created successfully",
     });
   } catch (error) {
-    console.error("Error details:", error); // Log the error details for debugging
     return next(createHttpError(500, "Error while uploading files"));
   } finally {
     await unlinkSafe(filePath); // Delete the local file after uploading to Cloudinary
@@ -89,8 +88,31 @@ const getClients = async (req: Request, res: Response, next: NextFunction) => {
       message: "Clients retrieved successfully",
     });
   } catch (error) {
-    console.error(error);
     next(createHttpError(500, "Error while retrieving clients"));
+  }
+};
+
+// ─────────────────────────────────────────────
+// GET SINGLE CLIENT
+// ─────────────────────────────────────────────
+
+const getSingleClient = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  const clientId = req.params.clientId;
+  try {
+    const client = await clientModel.findOne({ _id: clientId });
+    if (!client) {
+      return next(createHttpError(404, "Client not found"));
+    }
+    return res.status(200).json({
+      data: client,
+      message: "Client retrieved successfully",
+    });
+  } catch (error) {
+    return next(createHttpError(500, "Error while retrieving client"));
   }
 };
 
@@ -159,4 +181,4 @@ const updateClient = async (
   }
 };
 
-export { creatClient, getClients, updateClient };
+export { creatClient, getClients, getSingleClient, updateClient };
