@@ -15,11 +15,21 @@ import {
 import { Input } from '@/components/ui/input';
 import { Button } from './ui/button';
 import { Link } from 'react-router-dom';
+import { useRef } from 'react';
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<'div'>) {
+  const emailRef = useRef<HTMLInputElement>(null);
+  const passwordRef = useRef<HTMLInputElement>(null);
+
+  const handleLogin = () => {
+    const email = emailRef.current?.value;
+    const password = passwordRef.current?.value;
+    console.log('Data', { email, password });
+  };
+
   return (
     <div className={cn('flex flex-col gap-6', className)} {...props}>
       <Card>
@@ -54,12 +64,15 @@ export function LoginForm({
                 />
               </Field>
               <Field>
-                <Button type="submit">Login</Button>
+                <Button type="submit" onClick={handleLogin}>
+                  Login
+                </Button>
                 {/*<Button variant="outline" type="button">
                   Login with Google
                 </Button>*/}
                 <FieldDescription className="text-center">
-                  Don&apos;t have an account? <Link to="/auth/register">Sign up</Link>
+                  Don&apos;t have an account?{' '}
+                  <Link to="/auth/register">Sign up</Link>
                 </FieldDescription>
               </Field>
             </FieldGroup>
