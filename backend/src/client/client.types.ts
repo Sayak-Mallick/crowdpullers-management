@@ -1,10 +1,10 @@
-import { User } from "@/user/user.types";
+import { User } from "../user/user.types";
 
 export interface Client {
   _id: string;
   name: string;
   clientLogo: string;
-  addedBy: User;
+  // addedBy: User;
   createdAt: Date;
   updatedAt: Date;
 }

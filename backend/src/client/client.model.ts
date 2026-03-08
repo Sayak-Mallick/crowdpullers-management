@@ -11,10 +11,10 @@ const clientModel = new mongoose.Schema<Client>(
       type: String,
       required: true,
     },
-    addedBy: {
-      type: mongoose.Schema.Types.ObjectId,
-      required: true,
-    },
+    // addedBy: {
+    //   type: mongoose.Schema.Types.ObjectId,
+    //   required: true,
+    // },
   },
   { timestamps: true },
 );

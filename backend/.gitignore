@@ -144,3 +144,7 @@ vite.config.ts.timestamp-*
 .vite/
 
 package-lock.json
+
+
+# Public upload directory
+public/uploads/
