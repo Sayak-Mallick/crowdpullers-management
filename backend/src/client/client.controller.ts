@@ -60,4 +60,17 @@ const creatClient = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
-export { creatClient };
+const getClients = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const clients = await clientModel.find();
+    res.status(200).json({
+      data: clients,
+      message: "Clients retrieved successfully",
+    });
+  } catch (error) {
+    console.error(error);
+    next(createHttpError(500, "Error while retrieving clients"));
+  }
+};
+
+export { creatClient, getClients };

@@ -1,5 +1,5 @@
 import express from "express";
-import { creatClient } from "./client.controller";
+import { creatClient, getClients } from "./client.controller";
 import multer from "multer";
 import path from "node:path";
 
@@ -9,6 +9,7 @@ const upload = multer({
   limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
 });
 
+clientRouter.get("/", getClients);
 clientRouter.post(
   "/",
   upload.fields([{ name: "clientLogo", maxCount: 1 }]),
