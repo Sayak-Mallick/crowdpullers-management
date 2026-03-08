@@ -170,8 +170,6 @@ const updateClient = async (
       { new: true, runValidators: true },
     );
 
-    console.log(updatedClient, "hshhshs");
-
     res.status(200).json({
       data: updatedClient,
       message: "Client updated successfully",
@@ -181,4 +179,20 @@ const updateClient = async (
   }
 };
 
-export { creatClient, getClients, getSingleClient, updateClient };
+const deleteClient = async (req: Request, res: Response, next: NextFunction) => {
+  const clientId = req.params.clientId;
+  try {
+    const deletedClient = await clientModel.findByIdAndDelete(clientId);
+    if (!deletedClient) {
+      return next(createHttpError(404, "Client not found"));
+    }
+    res.status(200).json({
+      data: deletedClient,
+      message: "Client deleted successfully",
+    });
+  } catch (error) {
+    return next(createHttpError(500, "Error while deleting client"));
+  }
+};
+
+export { creatClient, getClients, getSingleClient, updateClient, deleteClient };

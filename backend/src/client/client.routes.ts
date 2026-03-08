@@ -1,5 +1,11 @@
 import express from "express";
-import { creatClient, getClients, getSingleClient, updateClient } from "./client.controller";
+import {
+  creatClient,
+  deleteClient,
+  getClients,
+  getSingleClient,
+  updateClient,
+} from "./client.controller";
 import multer from "multer";
 import path from "node:path";
 
@@ -10,7 +16,7 @@ const upload = multer({
 });
 
 clientRouter.get("/", getClients);
-clientRouter.get("/:clientId", getSingleClient)
+clientRouter.get("/:clientId", getSingleClient);
 clientRouter.post(
   "/",
   upload.fields([{ name: "clientLogo", maxCount: 1 }]),
@@ -21,5 +27,6 @@ clientRouter.patch(
   upload.fields([{ name: "clientLogo", maxCount: 1 }]),
   updateClient,
 );
+clientRouter.delete("/:clientId", deleteClient);
 
 export default clientRouter;
