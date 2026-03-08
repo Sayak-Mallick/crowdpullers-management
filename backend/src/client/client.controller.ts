@@ -179,17 +179,25 @@ const updateClient = async (
   }
 };
 
-const deleteClient = async (req: Request, res: Response, next: NextFunction) => {
+const deleteClient = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   const clientId = req.params.clientId;
+  const client = await clientModel.findOne({ _id: clientId });
+  if (!client) {
+    return next(createHttpError(404, "Client not found"));
+  }
+
+  const clientLogoSplits = client.clientLogo.split("/");
+  const clientLogoPublicId =
+    clientLogoSplits.at(-2) + "/" + clientLogoSplits.at(-1)?.split(".").at(-2);
+
   try {
-    const deletedClient = await clientModel.findByIdAndDelete(clientId);
-    if (!deletedClient) {
-      return next(createHttpError(404, "Client not found"));
-    }
-    res.status(200).json({
-      data: deletedClient,
-      message: "Client deleted successfully",
-    });
+    await cloudinary.uploader.destroy(clientLogoPublicId);
+    await clientModel.deleteOne({ _id: clientId });
+    res.sendStatus(204);
   } catch (error) {
     return next(createHttpError(500, "Error while deleting client"));
   }
