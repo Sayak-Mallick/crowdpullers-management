@@ -53,7 +53,7 @@ const createUser = async (req: Request, res: Response, next: NextFunction) => {
       algorithm: "HS256",
     });
 
-    res.json({
+    res.status(201).json({
       accessToken: token,
       id: newUser._id,
       message: "✅ User registered successfully",
@@ -63,4 +63,51 @@ const createUser = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
-export { createUser };
+const loginUser = async (req: Request, res: Response, next: NextFunction) => {
+  const { email, password } = req.body;
+
+  // Basic Validation
+  if (!email || !password) {
+    const error = createHttpError(400, "😒 All fields are required");
+    return next(error);
+  }
+
+  // database call to check if user exists
+  let user: User | null;
+  try {
+    user = await userModel.findOne({ email: email });
+    if (!user) {
+      const error = createHttpError(404, "😒 User not Found");
+      return next(error);
+    }
+  } catch (error) {
+    return next(createHttpError(500, "❌ Error while checking user existence"));
+  }
+
+  try {
+    const isPasswordMatch = await bcrypt.compare(password, user.password);
+    if (!isPasswordMatch) {
+      const error = createHttpError(400, "😒 Email or password is incorrect");
+      return next(error);
+    }
+  } catch (error) {
+    return next(createHttpError(500, "❌ Error while comparing passwords"));
+  }
+ 
+  // jwt token generation for authentication
+  try {
+    const token = sign({ sub: user._id }, config.JWT_SECRET as string, {
+      expiresIn: "10h",
+      algorithm: "HS256",
+    });
+
+    res.status(201).json({
+      accessToken: token,
+      message: "✅ Logged in successfully",
+    });
+  } catch (error) {
+    return next(createHttpError(500, "❌ Error while generating access token"));
+  }
+};
+
+export { createUser, loginUser };
