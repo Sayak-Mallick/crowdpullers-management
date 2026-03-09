@@ -71,3 +71,36 @@ export default defineConfig([
   },
 ])
 ```
+
+Traditionally, we use the following for POST api calls:
+
+```js
+  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault(); // prevents page refresh
+    const email = emailRef.current?.value;
+    const password = passwordRef.current?.value;
+    if (!email || !password) return;
+    try {
+      const response = await fetch("http://localhost:3054/api/users/login", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          password,
+        }),
+      });
+      if (!response.ok) {
+        const error = await response.json();
+        console.error(error);
+        return;
+      }
+      const data = await response.json();
+      console.log('Login successful', data);
+      navigate('/');
+    } catch (error) {
+      console.error("Login error", error);
+    }
+  };
+```

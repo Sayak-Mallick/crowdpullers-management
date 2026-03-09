@@ -16,6 +16,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "./ui/button";
 import { Link, useNavigate } from "react-router-dom";
 import { useRef } from "react";
+import { useMutation } from "@tanstack/react-query";
+import { login } from "@/services/api/auth.endpoints";
 
 export function LoginForm({
   className,
@@ -25,33 +27,23 @@ export function LoginForm({
   const passwordRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
 
+  const mutation = useMutation({
+    mutationFn: login,
+    onSuccess: () => {
+      console.log("Login successful");
+      navigate("/");
+    },
+  });
+
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault(); // prevents page refresh
     const email = emailRef.current?.value;
     const password = passwordRef.current?.value;
-    if (!email || !password) return;
-    try {
-      const response = await fetch("http://localhost:3054/api/users/login", {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email,
-          password,
-        }),
-      });
-      if (!response.ok) {
-        const error = await response.json();
-        console.error(error);
-        return;
-      }
-      const data = await response.json();
-      console.log('Login successful', data);
-      navigate('/');
-    } catch (error) {
-      console.error("Login error", error);
-    }
+    if (!email || !password) {
+      // TODO: show error message via snackbars
+      return;
+    };
+    mutation.mutate({ email, password });
   };
 
   return (
@@ -68,7 +60,13 @@ export function LoginForm({
             <FieldGroup>
               <Field>
                 <FieldLabel htmlFor="email">Email</FieldLabel>
-                <Input id="email" type="email" ref={emailRef} placeholder="email" required />
+                <Input
+                  id="email"
+                  type="email"
+                  ref={emailRef}
+                  placeholder="email"
+                  required
+                />
               </Field>
               <Field>
                 <div className="flex items-center">
@@ -89,9 +87,7 @@ export function LoginForm({
                 />
               </Field>
               <Field>
-                <Button type="submit">
-                  Login
-                </Button>
+                <Button type="submit">Login</Button>
                 {/*<Button variant="outline" type="button">
                   Login with Google
                 </Button>*/}
