@@ -18,6 +18,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useRef } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { login } from "@/services/api/auth.endpoints";
+import { LoaderCircle } from "lucide-react";
 
 export function LoginForm({
   className,
@@ -35,14 +36,14 @@ export function LoginForm({
     },
   });
 
-  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault(); // prevents page refresh
+  const handleLogin = async () => {
+    // e.preventDefault(); // prevents page refresh
     const email = emailRef.current?.value;
     const password = passwordRef.current?.value;
     if (!email || !password) {
       // TODO: show error message via snackbars
       return;
-    };
+    }
     mutation.mutate({ email, password });
   };
 
@@ -56,7 +57,7 @@ export function LoginForm({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleLogin}>
+          <form>
             <FieldGroup>
               <Field>
                 <FieldLabel htmlFor="email">Email</FieldLabel>
@@ -87,7 +88,17 @@ export function LoginForm({
                 />
               </Field>
               <Field>
-                <Button type="submit">Login</Button>
+                <Button
+                  type="button"
+                  className="w-full flex items-center gap-1"
+                  onClick={handleLogin}
+                  disabled={mutation.isPending}
+                >
+                  {mutation.isPending && (
+                    <LoaderCircle className="animate-spin" />
+                  )}
+                  <span>Login</span>
+                </Button>
                 {/*<Button variant="outline" type="button">
                   Login with Google
                 </Button>*/}
