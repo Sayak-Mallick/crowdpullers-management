@@ -55,6 +55,11 @@ export function LoginForm({
           <CardDescription>
             Enter your email below to login to your account
           </CardDescription>
+          {mutation.isError && (
+            <p className="text-sm text-red-500 mt-1">
+              {mutation.error.message || "Something went wrong"}
+            </p>
+          )}
         </CardHeader>
         <CardContent>
           <form>
