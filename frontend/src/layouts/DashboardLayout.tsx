@@ -1,12 +1,12 @@
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardHeader,
   CardTitle,
   CardDescription,
   CardContent,
-} from '@/components/ui/card';
+} from "@/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,10 +14,10 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Input } from '@/components/ui/input';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import useTokenStore from '@/store';
+} from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import useTokenStore from "@/store";
 import {
   Bell,
   CircleUser,
@@ -29,16 +29,19 @@ import {
   Search,
   ShoppingCart,
   Users,
-} from 'lucide-react';
-import { Link, Navigate, NavLink, Outlet } from 'react-router-dom';
+} from "lucide-react";
+import { Link, Navigate, NavLink, Outlet } from "react-router-dom";
 
 const DashboardLayout = () => {
+  const { token, setToken } = useTokenStore((state) => state);
 
-  const token = useTokenStore((state) => state.token);
-
-  if(!token) {
+  if (!token) {
     return <Navigate to="/auth/login" replace />;
   }
+
+  const handleLogout = () => {
+    setToken("");
+  };
 
   return (
     <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
@@ -60,7 +63,7 @@ const DashboardLayout = () => {
                 to="/"
                 className={({ isActive }) => {
                   return `flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary ${
-                    isActive && 'bg-muted'
+                    isActive && "bg-muted"
                   }`;
                 }}
               >
@@ -72,12 +75,12 @@ const DashboardLayout = () => {
                 to="/clients"
                 className={({ isActive }) => {
                   return `flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary ${
-                    isActive && 'bg-muted'
+                    isActive && "bg-muted"
                   }`;
                 }}
               >
                 <Package className="h-4 w-4" />
-                Clients{' '}
+                Clients{" "}
               </NavLink>
             </nav>
           </div>
@@ -203,8 +206,8 @@ const DashboardLayout = () => {
               <DropdownMenuItem>Settings</DropdownMenuItem>
               <DropdownMenuItem>Support</DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>
-                <Button variant={'link'}>Logout</Button>
+              <DropdownMenuItem onClick={handleLogout}>
+                Logout
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
