@@ -19,6 +19,7 @@ import { useRef } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { login } from "@/services/api/auth.endpoints";
 import { LoaderCircle } from "lucide-react";
+import useTokenStore from "@/store";
 
 export function LoginForm({
   className,
@@ -27,11 +28,13 @@ export function LoginForm({
   const emailRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
+  const setToken = useTokenStore((state) => state.setToken);
 
   const mutation = useMutation({
     mutationFn: login,
-    onSuccess: () => {
+    onSuccess: (response) => {
       console.log("Login successful");
+      setToken(response.data.accessToken);
       navigate("/");
     },
   });

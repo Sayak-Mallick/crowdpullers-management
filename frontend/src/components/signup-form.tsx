@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { register } from "@/services/api/auth.endpoints";
+import useTokenStore from "@/store";
 import { useMutation } from "@tanstack/react-query";
 import { LoaderCircle } from "lucide-react";
 import { useRef } from "react";
@@ -21,6 +22,7 @@ import { Link, useNavigate } from "react-router-dom";
 
 export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
   const navigate = useNavigate();
+  const setToken = useTokenStore((state) => state.setToken);
   const nameRef = useRef<HTMLInputElement>(null);
   const emailRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
@@ -28,7 +30,8 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
 
   const mutation = useMutation({
     mutationFn: register,
-    onSuccess: () => {
+    onSuccess: (response) => {
+      setToken(response.data.accessToken);
       navigate("/auth/login");
     },
   });
