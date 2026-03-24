@@ -33,7 +33,8 @@ import {
 } from "@/components/ui/table";
 import { getClients } from "@/services/api/clients.endpoints";
 import { useQuery } from "@tanstack/react-query";
-import { MoreHorizontal } from "lucide-react";
+import { CirclePlus, MoreHorizontal } from "lucide-react";
+import { Link } from "react-router-dom";
 
 interface IClients {
   _id: string;
@@ -68,17 +69,27 @@ const ClientPage = () => {
 
   return (
     <>
-      <Breadcrumb>
-        <BreadcrumbList>
-          <BreadcrumbItem>
-            <BreadcrumbLink href="/">Home</BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbPage>Clients</BreadcrumbPage>
-          </BreadcrumbItem>
-        </BreadcrumbList>
-      </Breadcrumb>
+      <div className="flex items-center justify-between gap-4">
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink>
+                <Link to="/">Home</Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>Clients</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+        <Link to={"/clients/create"}>
+          <Button>
+            <CirclePlus size={20} className="h-4 w-4" />
+            <span>Add New Client</span>
+          </Button>
+        </Link>
+      </div>
       <Card className="mt-6">
         <CardHeader>
           <CardTitle>Clients</CardTitle>
@@ -156,7 +167,8 @@ const ClientPage = () => {
         </CardContent>
         <CardFooter>
           <div className="text-xs text-muted-foreground">
-            Showing <strong>1-10</strong> of <strong>32</strong> products
+            Showing <strong>1-{clients?.data?.data?.length || 0}</strong> of{" "}
+            <strong>{clients?.data?.data?.length || 0}</strong> clients
           </div>
         </CardFooter>
       </Card>
