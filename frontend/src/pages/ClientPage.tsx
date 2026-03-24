@@ -34,13 +34,37 @@ import {
 import { getClients } from "@/services/api/clients.endpoints";
 import { useQuery } from "@tanstack/react-query";
 import { MoreHorizontal } from "lucide-react";
-import ReactSVG from "../assets/react.svg"
+
+interface IClients {
+  _id: string;
+  name: string;
+  clientLogo: string;
+  createdAt: string;
+  updatedAt: string;
+}
 
 const ClientPage = () => {
-  const { data, isLoading, isError } = useQuery({
+  const {
+    data: clients,
+    // isLoading,
+    // isError,
+  } = useQuery({
     queryKey: ["clients"],
     queryFn: getClients,
+    staleTime: 1000 * 60 * 5,
   });
+
+  const formatDate = (date: string) => {
+    if (!date) return "";
+    return new Date(date).toLocaleString("en-US", {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "numeric",
+      minute: "numeric",
+    });
+  };
 
   return (
     <>
@@ -69,13 +93,13 @@ const ClientPage = () => {
                 <TableHead className="hidden w-25 sm:table-cell">
                   <span className="sr-only">Image</span>
                 </TableHead>
+                <TableHead>ID</TableHead>
                 <TableHead>Title</TableHead>
-                <TableHead>Genre</TableHead>
-                <TableHead className="hidden md:table-cell">
-                  Author name
-                </TableHead>
                 <TableHead className="hidden md:table-cell">
                   Created at
+                </TableHead>
+                <TableHead className="hidden md:table-cell">
+                  Updated at
                 </TableHead>
                 <TableHead>
                   <span className="sr-only">Actions</span>
@@ -83,42 +107,50 @@ const ClientPage = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              <TableRow>
-                <TableCell className="hidden sm:table-cell">
-                  <img
-                    alt={ReactSVG}
-                    className="aspect-square rounded-md object-cover"
-                    height="64"
-                    src={ReactSVG}
-                    width="64"
-                  />
-                </TableCell>
-                <TableCell className="font-medium">title</TableCell>
-                <TableCell>
-                  <Badge variant="outline">genre</Badge>
-                </TableCell>
-                <TableCell className="hidden md:table-cell">
-                  author.name
-                </TableCell>
-                <TableCell className="hidden md:table-cell">
-                  book.createdAt
-                </TableCell>
-                <TableCell>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button aria-haspopup="true" size="icon" variant="ghost">
-                        <MoreHorizontal className="h-4 w-4" />
-                        <span className="sr-only">Toggle menu</span>
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                      <DropdownMenuItem>Edit</DropdownMenuItem>
-                      <DropdownMenuItem>Delete</DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
-              </TableRow>
+              {clients?.data?.data?.map((client: IClients) => {
+                return (
+                  <TableRow key={client?._id}>
+                    <TableCell className="hidden sm:table-cell">
+                      <img
+                        alt={client.name}
+                        className="aspect-square rounded-md object-cover"
+                        height="64"
+                        src={client?.clientLogo}
+                        width="64"
+                      />
+                    </TableCell>
+                    <TableCell className="font-medium">{client?._id}</TableCell>
+                    <TableCell>
+                      <Badge variant="outline">{client?.name}</Badge>
+                    </TableCell>
+                    <TableCell className="hidden md:table-cell">
+                      {formatDate(client?.createdAt)}
+                    </TableCell>
+                    <TableCell className="hidden md:table-cell">
+                      {formatDate(client?.updatedAt)}
+                    </TableCell>
+                    <TableCell>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            aria-haspopup="true"
+                            size="icon"
+                            variant="ghost"
+                          >
+                            <MoreHorizontal className="h-4 w-4" />
+                            <span className="sr-only">Toggle menu</span>
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                          <DropdownMenuItem>Edit</DropdownMenuItem>
+                          <DropdownMenuItem>Delete</DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
             </TableBody>
           </Table>
         </CardContent>
