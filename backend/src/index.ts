@@ -1,16 +1,34 @@
-import "./server";
-import app from "./server";
-import { config } from "./config/config";
-import connectDB from "./config/db";
+import express, { Application, Request, Response, NextFunction } from "express";
+import dotenv from "dotenv";
+dotenv.config();
 
-const startServer = async () => {
-  await connectDB();
-  const PORT = config.PORT;
-  app.listen(PORT, () => {
-    console.log(`Server is running on [http://localhost:${PORT}]`);
-  });
-};
+const app: Application = express();
+const PORT = process.env.PORT || 3000;
 
-startServer();
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-console.log("Root index file is executing.");
+app.get("/", (_req: Request, res: Response) => {
+  res.json({ message: "Server is running 🚀", env: process.env.NODE_ENV });
+});
+
+app.get("/health", (_req: Request, res: Response) => {
+  res.json({ status: "ok", uptime: process.uptime() });
+});
+
+// 404 handler
+app.use((_req: Request, res: Response) => {
+  res.status(404).json({ error: "Route not found" });
+});
+
+// Global error handler
+app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
+  console.error(err.stack);
+  res.status(500).json({ error: "Internal Server Error" });
+});
+
+app.listen(PORT, () => {
+  console.log(`[server] Running on http://localhost:${PORT}`);
+});
+
+export default app;

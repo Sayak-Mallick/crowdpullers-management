@@ -1,46 +1,30 @@
 {
-  "name": "crowdpullers-management-backend",
+  "name": "backend",
   "version": "1.0.0",
   "description": "",
-  "main": "dist/server.js",
+  "main": "index.js",
   "scripts": {
-    "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
-    "build": "tsc",
-    "start": "node dist/server.js"
+    "dev": "set NODE_ENV=development && nodemon",
+    "build": "rimraf dist && tsc",
+    "start": "NODE_ENV=production node dist/index.js",
+    "start:prod": "npm run build && npm run start"
   },
-  "keywords": [
-    "express",
-    "typescript",
-    "backend"
-  ],
-  "author": "",
+  "keywords": [],
+  "author": "Sayak Mallick",
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
-    "bcrypt": "^6.0.0",
-    "cloudinary": "^2.9.0",
     "cors": "^2.8.6",
-    "dotenv": "^17.3.1",
+    "dotenv": "^17.4.2",
     "express": "^5.2.1",
-    "http-errors": "^2.0.1",
-    "jsonwebtoken": "^9.0.3",
-    "mongoose": "^9.2.4",
-    "multer": "^2.1.1"
+    "mongoose": "^9.4.1"
   },
   "devDependencies": {
-    "@types/bcrypt": "^6.0.0",
-    "@types/cors": "^2.8.19",
-    "@types/dotenv": "^6.1.1",
     "@types/express": "^5.0.6",
-    "@types/http-errors": "^2.0.5",
-    "@types/jsonwebtoken": "^9.0.10",
-    "@types/mongoose": "^5.11.96",
-    "@types/multer": "^2.1.0",
-    "@types/node": "^25.3.3",
+    "@types/node": "^25.6.0",
     "nodemon": "^3.1.14",
-    "prettier": "^3.8.1",
+    "rimraf": "^6.1.3",
     "ts-node": "^10.9.2",
-    "ts-node-dev": "^2.0.0",
-    "typescript": "^5.9.3"
+    "typescript": "^6.0.2"
   }
 }
