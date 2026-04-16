@@ -1,5 +1,6 @@
 import express, { Application, NextFunction, Request, Response } from "express";
 import cors from "cors";
+import globalErrorHandler from "./middlewares/globalErrorHandler";
 
 const app: Application = express();
 app.use(
@@ -21,5 +22,7 @@ app.get("/health", (req: Request, res: Response, next: NextFunction) => {
     message: "OK",
   });
 });
+
+app.use(globalErrorHandler);
 
 export default app;
