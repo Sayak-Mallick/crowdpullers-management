@@ -15,7 +15,10 @@ const connectDB = async () => {
     await mongoose.connect(process.env.MONGO_URI as string, {
       dbName: process.env.DB_NAME,
     });
-  } catch (error) {}
+  } catch (error) {
+    console.error("❌ Error connecting to MongoDB:", error);
+    process.exit(1);
+  }
 };
 
 export default connectDB;
