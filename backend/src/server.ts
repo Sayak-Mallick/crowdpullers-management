@@ -15,4 +15,11 @@ app.get("/", (req: Request, res: Response, next: NextFunction) => {
   });
 });
 
+app.get("/health", (req: Request, res: Response, next: NextFunction) => {
+  res.json({
+    status: 200,
+    message: "OK",
+  });
+});
+
 export default app;
