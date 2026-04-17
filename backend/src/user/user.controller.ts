@@ -11,36 +11,45 @@ const registerUser = async (
   next: NextFunction
 ) => {
   const { name, email, password } = req.body;
-
+  // Basic Validation
   if (!name || !email || !password) {
-    const error = createHttpError(400, "All fields are required");
+    const error = createHttpError(400, "😒 All fields are required");
     return next(error);
-  }
+  } // we can use express-validator for better validation
 
+  // TODO: in the next version we will implement express-validator for better validation
+
+  // database call to check if user already exists
   try {
     const user = await userModel.findOne({ email: email });
     if (user) {
-      const error = createHttpError(400, "User already exists");
+      const error = createHttpError(
+        400,
+        "😒 User with this email already exists"
+      );
       return next(error);
     }
   } catch (error) {
     return next(createHttpError(500, "❌ Error while checking user existence"));
   }
 
-  // Hashed Password
+  // hashed password to ensure security of user data
   const hashedPassword = await bcrypt.hash(password, 10);
 
+  // database call to create new user
   let newUser: User;
+
   try {
     newUser = await userModel.create({
-      name: name,
-      email: email,
+      name,
+      email,
       password: hashedPassword,
     });
   } catch (error) {
     return next(createHttpError(500, "❌ Error while creating user"));
   }
 
+  // jwt token generation for authentication
   try {
     const token = sign({ sub: newUser._id }, process.env.JWT_SECRET as string, {
       expiresIn: "10h",
@@ -60,11 +69,13 @@ const registerUser = async (
 const loginUser = async (req: Request, res: Response, next: NextFunction) => {
   const { email, password } = req.body;
 
+  // Basic Validation
   if (!email || !password) {
     const error = createHttpError(400, "😒 All fields are required");
     return next(error);
   }
 
+  // database call to check if user exists
   let user: User | null;
   try {
     user = await userModel.findOne({ email: email });
@@ -86,6 +97,7 @@ const loginUser = async (req: Request, res: Response, next: NextFunction) => {
     return next(createHttpError(500, "❌ Error while comparing passwords"));
   }
 
+  // jwt token generation for authentication
   try {
     const token = sign({ sub: user._id }, process.env.JWT_SECRET as string, {
       expiresIn: "10h",
