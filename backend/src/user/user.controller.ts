@@ -113,4 +113,20 @@ const loginUser = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
-export { registerUser, loginUser };
+const getAllUsers = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const users = await userModel.find();
+    res.status(200).json({
+      data: users,
+      message: "Clients retrieved successfully",
+    });
+  } catch (error) {
+    next(createHttpError(500, "Error while retrieving clients"));
+  }
+};
+
+export { registerUser, loginUser, getAllUsers };
