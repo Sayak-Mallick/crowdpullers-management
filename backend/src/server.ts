@@ -3,6 +3,7 @@ import cors from "cors";
 import globalErrorHandler from "./middlewares/globalErrorHandler";
 import userRouter from "./user/user.routes";
 import clientRouter from "./clients/client.routes";
+import eventRouter from "./events/events.routes";
 
 const app: Application = express();
 app.use(express.json());
@@ -14,6 +15,7 @@ app.use(
 
 app.use("/api/users", userRouter);
 app.use("/api/clients", clientRouter);
+app.use("/api/events", eventRouter);
 
 app.get("/", (req: Request, res: Response, next: NextFunction) => {
   res.json({
