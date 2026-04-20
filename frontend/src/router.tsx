@@ -1,46 +1,51 @@
-import { createBrowserRouter } from 'react-router-dom';
-import LoginPage from './pages/LoginPage';
-import HomePage from './pages/HomePage';
-import RegisterPage from './pages/RegisterPage';
-import DashboardLayout from './layouts/DashboardLayout';
-import { AuthLayout } from './layouts/AuthLayout';
-import ClientPage from './pages/ClientPage';
-import CreateClient from './pages/CreateClient';
-import EventsPage from './pages/EventsPage';
+import { createBrowserRouter } from "react-router-dom";
+import LoginPage from "./pages/LoginPage";
+import HomePage from "./pages/HomePage";
+import RegisterPage from "./pages/RegisterPage";
+import DashboardLayout from "./layouts/DashboardLayout";
+import { AuthLayout } from "./layouts/AuthLayout";
+import ClientPage from "./pages/ClientPage";
+import CreateClient from "./pages/CreateClient";
+import EventsPage from "./pages/EventsPage";
+import CreateEvent from "./pages/CreateEvent";
 
 export const router = createBrowserRouter([
   {
-    path: '/',
+    path: "/",
     element: <DashboardLayout />,
     children: [
       {
-        path: '',
+        path: "",
         element: <HomePage />,
       },
       {
-        path: 'clients',
+        path: "clients",
         element: <ClientPage />,
       },
       {
-        path: 'events',
+        path: "events",
         element: <EventsPage />,
       },
       {
-        path: 'clients/create',
-        element: <CreateClient />
-      }
+        path: "clients/create",
+        element: <CreateClient />,
+      },
+      {
+        path: "events/create",
+        element: <CreateEvent />,
+      },
     ],
   },
   {
-    path: '/auth',
+    path: "/auth",
     element: <AuthLayout />,
     children: [
       {
-        path: 'login',
+        path: "login",
         element: <LoginPage />,
       },
       {
-        path: 'register',
+        path: "register",
         element: <RegisterPage />,
       },
     ],
