@@ -1,5 +1,4 @@
 export interface Events {
-  _id: number;
   title: string;
   description: string;
   year: number;
@@ -7,7 +6,7 @@ export interface Events {
   location: string;
   organization: string;
   category: string;
-  image: string;
+  eventImage: string;
 }
 
 /**

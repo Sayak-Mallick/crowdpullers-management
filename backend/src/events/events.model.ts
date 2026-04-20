@@ -12,7 +12,7 @@ import { Events } from "./events.types";
  * - `lean()` compatible — no virtuals needed, keeping responses lightweight.
  * - `timestamps` enabled for audit / sort-by-latest use-cases.
  */
-const eventsSchema = new mongoose.Schema<Events>(
+const eventModel = new mongoose.Schema<Events>(
   {
     /** Display title of the event */
     title: {
@@ -67,7 +67,7 @@ const eventsSchema = new mongoose.Schema<Events>(
     },
 
     /** Cloudinary / S3 URL of the event banner image */
-    image: {
+    eventImage: {
       type: String,
       required: true,
     },
@@ -86,16 +86,16 @@ const eventsSchema = new mongoose.Schema<Events>(
  * so a separate single-field year index is only kept as a fallback
  * for sort-heavy queries where the planner prefers it.
  */
-eventsSchema.index({ year: 1, month: 1 });
+eventModel.index({ year: 1, month: 1 });
 
 /**
  * ── Text index ──────────────────────────────────────────────────
  * Allows $text searches across title, description & location
  * for a lightweight server-side search without a dedicated engine.
  */
-eventsSchema.index(
+eventModel.index(
   { title: "text", description: "text", location: "text" },
   { weights: { title: 10, location: 5, description: 1 } }
 );
 
-export default mongoose.model<Events>("Event", eventsSchema);
+export default mongoose.model<Events>("Event", eventModel);
