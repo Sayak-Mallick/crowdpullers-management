@@ -21,9 +21,13 @@ eventRouter.get("/:eventId", getSingleEvent);
 eventRouter.post(
   "/",
   upload.fields([{ name: "eventImage", maxCount: 1 }]),
-  createEvent,
+  createEvent
 );
-eventRouter.patch("/:eventId", updateEvent);
+eventRouter.patch(
+  "/:eventId",
+  upload.fields([{ name: "eventImage", maxCount: 1 }]),
+  updateEvent
+);
 eventRouter.delete("/:eventId", deleteEvent);
 
 export default eventRouter;

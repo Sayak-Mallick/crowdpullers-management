@@ -246,11 +246,24 @@ const updateEvent = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
-const deleteEvent = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+const deleteEvent = async (req: Request, res: Response, next: NextFunction) => {
+  const eventId = req.params.eventId;
+  const event = await eventModel.findOne({ _id: eventId });
+  if (!event) {
+    return next(createHttpError(404, "Event not found"));
+  }
+  const eventImageSplits = event.eventImage.split("/");
+  const lastPart = eventImageSplits[eventImageSplits.length - 1];
+  const folderPart = eventImageSplits[eventImageSplits.length - 2];
+  const eventImagePublicId = folderPart + "/" + lastPart.split(".")[0];
+
+  try {
+    await cloudinary.uploader.destroy(eventImagePublicId);
+    await eventModel.deleteOne({ _id: eventId });
+    res.sendStatus(204);
+  } catch (error) {
+    return next(createHttpError(500, "Error while deleting an event"));
+  }
 };
 
 export { createEvent, getAllEvents, getSingleEvent, updateEvent, deleteEvent };
