@@ -11,7 +11,7 @@ const sanitizeBody = (body: Record<string, unknown>) =>
     Object.entries(body).map(([k, v]) => [
       k.trim(),
       typeof v === "string" ? v.trim() : v,
-    ]),
+    ])
   );
 
 /** Deletes a local temp file — never throws, just logs. */
@@ -36,7 +36,7 @@ const clampInt = (
   raw: unknown,
   fallback: number,
   min: number,
-  max: number,
+  max: number
 ): number => {
   const n = Number(raw);
   if (!Number.isFinite(n)) return fallback;
@@ -75,7 +75,7 @@ const createEvent = async (req: Request, res: Response, next: NextFunction) => {
   const filePath = path.resolve(
     __dirname,
     "../../public/uploads/events",
-    file.filename,
+    file.filename
   );
 
   try {
@@ -111,14 +111,14 @@ const createEvent = async (req: Request, res: Response, next: NextFunction) => {
 const getAllEvents = async (
   req: Request,
   res: Response,
-  next: NextFunction,
+  next: NextFunction
 ) => {
   try {
     const page = clampInt(
       req.query.page,
       DEFAULT_PAGE,
       1,
-      Number.MAX_SAFE_INTEGER,
+      Number.MAX_SAFE_INTEGER
     );
     const limit = clampInt(req.query.limit, DEFAULT_LIMIT, 1, MAX_LIMIT);
     const skip = (page - 1) * limit;
@@ -163,19 +163,33 @@ const getAllEvents = async (
 const getSingleEvent = async (
   req: Request,
   res: Response,
-  next: NextFunction,
-) => {};
+  next: NextFunction
+) => {
+  const eventId = req.params.eventId;
+  try {
+    const event = await eventModel.findOne({ _id: eventId });
+    if (!event) {
+      return next(createHttpError(404, "Event not found"));
+    }
+    return res.status(200).json({
+      data: event,
+      message: "Event retrieved successfully",
+    });
+  } catch (error) {
+    return next(createHttpError(500, "Error while retrieving client"));
+  }
+};
 
 const updateEvent = async (
   req: Request,
   res: Response,
-  next: NextFunction,
+  next: NextFunction
 ) => {};
 
 const deleteEvent = async (
   req: Request,
   res: Response,
-  next: NextFunction,
+  next: NextFunction
 ) => {};
 
 export { createEvent, getAllEvents, getSingleEvent, updateEvent, deleteEvent };
