@@ -6,6 +6,7 @@ import DashboardLayout from './layouts/DashboardLayout';
 import { AuthLayout } from './layouts/AuthLayout';
 import ClientPage from './pages/ClientPage';
 import CreateClient from './pages/CreateClient';
+import EventsPage from './pages/EventsPage';
 
 export const router = createBrowserRouter([
   {
@@ -19,6 +20,10 @@ export const router = createBrowserRouter([
       {
         path: 'clients',
         element: <ClientPage />,
+      },
+      {
+        path: 'events',
+        element: <EventsPage />,
       },
       {
         path: 'clients/create',
