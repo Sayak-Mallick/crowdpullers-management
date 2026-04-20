@@ -176,20 +176,81 @@ const getSingleEvent = async (
       message: "Event retrieved successfully",
     });
   } catch (error) {
-    return next(createHttpError(500, "Error while retrieving client"));
+    return next(createHttpError(500, "Error while retrieving an event"));
   }
 };
 
-const updateEvent = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {};
+const updateEvent = async (req: Request, res: Response, next: NextFunction) => {
+  const { title, description, year, month, location, organization, category } =
+    sanitizeBody(req.body);
+  const eventId = req.params.eventId;
+
+  // Validate required fields
+  if (!title || !description || !location || !organization || !category) {
+    return next(createHttpError(400, "All fields are required"));
+  }
+
+  const parsedYear = Number(year);
+  const parsedMonth = Number(month);
+
+  const event = await eventModel.findOne({ _id: eventId });
+  // Validate required fields
+  if (!event) {
+    return next(createHttpError(404, "Event not found"));
+  }
+  const files = req.files as { [fieldname: string]: Express.Multer.File[] };
+  if (!files?.eventImage?.[0]) {
+    return next(createHttpError(400, "An event image file is required."));
+  }
+  const newFile = files?.eventImage?.[0];
+  const filePath = newFile
+    ? path.resolve(__dirname, "../../public/uploads/events", newFile.filename)
+    : null;
+
+  try {
+    let newSecureUrl: string | undefined;
+    if (newFile && filePath) {
+      const mimeParts = newFile.mimetype.split("/");
+      const mimeExt = mimeParts[mimeParts.length - 1];
+      const uploadResult = await cloudinary.uploader.upload(filePath, {
+        filename_override: newFile.filename,
+        folder: "cp-events",
+        format: mimeExt,
+      });
+      newSecureUrl = uploadResult.secure_url;
+    }
+    const updatedPayload: Record<string, unknown> = {
+      title,
+      description,
+      year: parsedYear,
+      month: parsedMonth,
+      location,
+      organization,
+      category,
+    };
+
+    if (newSecureUrl) updatedPayload.eventImage = newSecureUrl;
+
+    const updatedEvent = await eventModel.findByIdAndUpdate(
+      eventId,
+      updatedPayload,
+      { new: true, runValidators: true }
+    );
+
+    res.status(200).json({
+      data: updatedEvent,
+      message: "Event updated successfully",
+    });
+  } catch (error) {
+    return next(createHttpError(500, "Error while updating event"));
+  }
+};
 
 const deleteEvent = async (
   req: Request,
   res: Response,
   next: NextFunction
-) => {};
+) => {
+};
 
 export { createEvent, getAllEvents, getSingleEvent, updateEvent, deleteEvent };
