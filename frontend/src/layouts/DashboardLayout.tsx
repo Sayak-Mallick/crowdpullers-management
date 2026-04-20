@@ -20,6 +20,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import useTokenStore from "@/store";
 import {
   Bell,
+  Calendar,
   CircleUser,
   Home,
   LineChart,
@@ -81,6 +82,18 @@ const DashboardLayout = () => {
               >
                 <Package className="h-4 w-4" />
                 Clients{" "}
+              </NavLink>
+
+              <NavLink
+                to="/events"
+                className={({ isActive }) => {
+                  return `flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary ${
+                    isActive && "bg-muted"
+                  }`;
+                }}
+              >
+                <Calendar className="h-4 w-4" />
+                Events{" "}
               </NavLink>
             </nav>
           </div>
@@ -206,9 +219,7 @@ const DashboardLayout = () => {
               <DropdownMenuItem>Settings</DropdownMenuItem>
               <DropdownMenuItem>Support</DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={handleLogout}>
-                Logout
-              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </header>
