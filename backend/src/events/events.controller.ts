@@ -97,6 +97,7 @@ const createEvent = async (req: Request, res: Response, next: NextFunction) => {
 
     return res.status(201).json({
       id: newEvent._id,
+      message: "Event created successfully",
     });
   } catch (error) {
     console.error("Create Event Error:", error);
