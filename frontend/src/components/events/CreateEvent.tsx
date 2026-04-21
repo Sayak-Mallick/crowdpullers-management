@@ -486,24 +486,39 @@ const CreateEvent = () => {
               <FormField
                 control={form.control}
                 name="year"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                      Year
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        className="h-11 w-36"
-                        min={1900}
-                        max={2100}
-                        {...field}
-                        value={field.value as number}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                render={({ field }) => {
+                  const currentYear = new Date().getFullYear();
+                  const years = Array.from(
+                    { length: 200 },
+                    (_, i) => currentYear + 50 - i,
+                  );
+
+                  return (
+                    <FormItem>
+                      <FormLabel className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                        Year
+                      </FormLabel>
+
+                      <FormControl>
+                        <select
+                          value={field.value as number}
+                          onChange={(e) =>
+                            field.onChange(Number(e.target.value))
+                          }
+                          className="h-11 w-36 rounded-md border bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                        >
+                          {years.map((year) => (
+                            <option key={year} value={year}>
+                              {year}
+                            </option>
+                          ))}
+                        </select>
+                      </FormControl>
+
+                      <FormMessage />
+                    </FormItem>
+                  );
+                }}
               />
 
               <FormField

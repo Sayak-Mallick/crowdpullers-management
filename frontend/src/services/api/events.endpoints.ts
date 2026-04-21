@@ -20,3 +20,7 @@ export const createEvent = async (data: FormData) => {
     },
   });
 };
+
+export const getEventByID = async (id: string) => {
+  return api.get(`/api/events/${id}`);
+};

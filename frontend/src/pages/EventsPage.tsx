@@ -45,7 +45,7 @@ import {
   Tag,
   Calendar,
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -159,6 +159,7 @@ function CategoryBadge({ category }: { category: string }) {
 // ─── Main component ───────────────────────────────────────────────────────────
 
 const EventsPage = () => {
+  const navigate = useNavigate();
   const [search, setSearch] = useState("");
 
   const { data: eventsData } = useQuery({
@@ -368,7 +369,11 @@ const EventsPage = () => {
                           Actions
                         </DropdownMenuLabel>
                         <DropdownMenuItem>Edit event</DropdownMenuItem>
-                        <DropdownMenuItem>View details</DropdownMenuItem>
+                        <DropdownMenuItem
+                          onSelect={() => navigate(`/events/${event._id}`)}
+                        >
+                          View details
+                        </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem className="text-destructive focus:text-destructive">
                           Delete

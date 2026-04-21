@@ -5,9 +5,10 @@ import RegisterPage from "./pages/RegisterPage";
 import DashboardLayout from "./layouts/DashboardLayout";
 import { AuthLayout } from "./layouts/AuthLayout";
 import ClientPage from "./pages/ClientPage";
-import CreateClient from "./pages/CreateClient";
+import CreateClient from "./components/clients/CreateClient";
 import EventsPage from "./pages/EventsPage";
-import CreateEvent from "./pages/CreateEvent";
+import CreateEvent from "./components/events/CreateEvent";
+import EventDetails from "./components/events/EventDetails";
 
 export const router = createBrowserRouter([
   {
@@ -33,6 +34,10 @@ export const router = createBrowserRouter([
       {
         path: "events/create",
         element: <CreateEvent />,
+      },
+      {
+        path: "events/:id",
+        element: <EventDetails />,
       },
     ],
   },
