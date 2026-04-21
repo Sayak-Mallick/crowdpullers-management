@@ -7,9 +7,23 @@ import eventRouter from "./events/events.routes";
 
 const app: Application = express();
 app.use(express.json());
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://www.crowdpullers.in",
+  "http://localhost:5173",
+];
+
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL,
+    origin: function (origin, callback) {
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      } else {
+        return callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
   })
 );
 
