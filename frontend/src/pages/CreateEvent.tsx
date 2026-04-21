@@ -54,11 +54,13 @@ const formSchema = z.object({
 });
 
 type FormValues = z.infer<typeof formSchema>;
+type FormInput = z.input<typeof formSchema>; // BEFORE parsing (unknown for coerce)
+type FormOutput = z.output<typeof formSchema>; // AFTER parsing (number)
 
 const CreateEvent = () => {
   const navigate = useNavigate();
 
-  const form = useForm<FormValues, unknown, FormValues>({
+  const form = useForm<FormInput, unknown, FormOutput>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       title: "",
@@ -175,7 +177,12 @@ const CreateEvent = () => {
                     <FormItem>
                       <FormLabel>Year</FormLabel>
                       <FormControl>
-                        <Input type="number" className="w-full" {...field} />
+                        <Input
+                          type="number"
+                          className="w-full"
+                          {...field}
+                          value={field.value as number}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -189,7 +196,12 @@ const CreateEvent = () => {
                     <FormItem>
                       <FormLabel>Month</FormLabel>
                       <FormControl>
-                        <Input type="number" className="w-full" {...field} />
+                        <Input
+                          type="number"
+                          className="w-full"
+                          {...field}
+                          value={field.value as number}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
