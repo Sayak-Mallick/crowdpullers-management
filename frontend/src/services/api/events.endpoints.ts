@@ -24,3 +24,7 @@ export const createEvent = async (data: FormData) => {
 export const getEventByID = async (id: string) => {
   return api.get(`/api/events/${id}`);
 };
+
+export const deleteEvent = async (id: string) => {
+  return api.delete(`/api/events/${id}`);
+};

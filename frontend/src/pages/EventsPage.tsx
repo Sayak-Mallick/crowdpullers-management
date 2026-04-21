@@ -46,6 +46,8 @@ import {
   Calendar,
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { deleteEvent } from "@/services/api/events.endpoints";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -185,6 +187,15 @@ const EventsPage = () => {
   const totalEvents = allEvents.length;
   const totalCategories = new Set(allEvents.map((e) => e.category)).size;
   const totalOrganizations = new Set(allEvents.map((e) => e.organization)).size;
+
+  const queryClient = useQueryClient();
+
+  const deleteMutation = useMutation({
+    mutationFn: deleteEvent,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["events"] });
+    },
+  });
 
   return (
     <div className="space-y-5">
@@ -375,8 +386,12 @@ const EventsPage = () => {
                           View details
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem className="text-destructive focus:text-destructive">
-                          Delete
+                        <DropdownMenuItem
+                          className="text-destructive focus:text-destructive"
+                          onSelect={() => deleteMutation.mutate(event._id)}
+                          disabled={deleteMutation.isPending}
+                        >
+                          {deleteMutation.isPending ? "Deleting…" : "Delete"}
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
