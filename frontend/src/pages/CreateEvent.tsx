@@ -28,6 +28,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { LoaderCircle } from "lucide-react";
 
 const currentYear = new Date().getFullYear();
 
@@ -122,7 +123,10 @@ const CreateEvent = () => {
                   <span className="ml-2">Cancel</span>
                 </Button>
               </Link>
-              <Button type="submit">
+              <Button type="submit" disabled={mutation.isPending}>
+                {mutation.isPending && (
+                  <LoaderCircle className="animate-spin" />
+                )}
                 <span className="ml-2">Submit</span>
               </Button>
             </div>
