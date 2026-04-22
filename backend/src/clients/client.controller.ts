@@ -13,7 +13,6 @@ const sanitizeBody = (body: Record<string, unknown>) =>
     ])
   );
 
-/** Deletes a local temp file — never throws, just logs. */
 const unlinkSafe = async (filePath: string) => {
   try {
     await fs.promises.unlink(filePath);
@@ -30,7 +29,6 @@ const createClient = async (
   const { name } = sanitizeBody(req.body);
   const files = req.files as { [fieldname: string]: Express.Multer.File[] };
 
-  // Validate the name field
   if (!name || typeof name !== "string" || name.trim() === "") {
     return next(
       createHttpError(
@@ -50,8 +48,7 @@ const createClient = async (
     "../../public/uploads/clients",
     file.filename
   );
-  const mimeParts = file.mimetype.split("/");
-  const mimeExt = mimeParts[mimeParts.length - 1];
+  const mimeExt = file.mimetype.split("/").pop();
 
   try {
     const uploadResult = await cloudinary.uploader.upload(filePath, {
@@ -63,7 +60,6 @@ const createClient = async (
     const newClient = await clientModel.create({
       name,
       clientLogo: uploadResult.secure_url,
-      // cloudinaryPublicId: uploadResult.public_id, // ← store for future deletion
     });
 
     res.status(201).json({
@@ -73,7 +69,7 @@ const createClient = async (
   } catch (error) {
     return next(createHttpError(500, "Error while uploading files"));
   } finally {
-    await unlinkSafe(filePath); // Delete the local file after uploading to Cloudinary
+    await unlinkSafe(filePath);
   }
 };
 
@@ -83,7 +79,17 @@ const getAllClient = async (
   next: NextFunction
 ) => {
   try {
-    const clients = await clientModel.find();
+    const clients = await clientModel
+      .find()
+      // Only fetch the fields the frontend actually needs — skip __v
+      .select("name clientLogo createdAt updatedAt")
+      // Returns plain JS objects — no Mongoose document overhead (~2-5x faster)
+      .lean()
+      .sort({ createdAt: -1 });
+
+    // Cache: browser/CDN may serve this for 60s, stale for 5 min while revalidating
+    res.set("Cache-Control", "public, max-age=60, stale-while-revalidate=300");
+
     res.status(200).json({
       data: clients,
       message: "Clients retrieved successfully",
@@ -98,12 +104,18 @@ const getSingleClient = async (
   res: Response,
   next: NextFunction
 ) => {
-  const clientId = req.params.clientId;
+  const { clientId } = req.params;
   try {
-    const client = await clientModel.findOne({ _id: clientId });
+    const client = await clientModel
+      .findById(clientId)
+      .select("name clientLogo createdAt updatedAt")
+      .lean();
+
     if (!client) {
       return next(createHttpError(404, "Client not found"));
     }
+
+    res.set("Cache-Control", "public, max-age=60, stale-while-revalidate=300");
     return res.status(200).json({
       data: client,
       message: "Client retrieved successfully",
@@ -119,7 +131,7 @@ const updateClient = async (
   next: NextFunction
 ) => {
   const { name } = sanitizeBody(req.body);
-  const clientId = req.params.clientId;
+  const { clientId } = req.params;
 
   if (!name || typeof name !== "string") {
     return next(
@@ -130,7 +142,7 @@ const updateClient = async (
     );
   }
 
-  const client = await clientModel.findOne({ _id: clientId });
+  const client = await clientModel.findById(clientId).lean();
   if (!client) {
     return next(createHttpError(404, "Client not found"));
   }
@@ -144,8 +156,7 @@ const updateClient = async (
   try {
     let newSecureUrl: string | undefined;
     if (newFile && filePath) {
-      const mimeParts = newFile.mimetype.split("/");
-      const mimeExt = mimeParts[mimeParts.length - 1];
+      const mimeExt = newFile.mimetype.split("/").pop();
       const uploadResult = await cloudinary.uploader.upload(filePath, {
         filename_override: newFile.filename,
         folder: "cp-clients",
@@ -155,14 +166,15 @@ const updateClient = async (
     }
 
     const updatePayload: Record<string, unknown> = { name };
-
     if (newSecureUrl) updatePayload.clientLogo = newSecureUrl;
 
-    const updatedClient = await clientModel.findByIdAndUpdate(
-      clientId,
-      updatePayload,
-      { new: true, runValidators: true }
-    );
+    const updatedClient = await clientModel
+      .findByIdAndUpdate(clientId, updatePayload, {
+        new: true,
+        runValidators: true,
+      })
+      .select("name clientLogo createdAt updatedAt")
+      .lean();
 
     res.status(200).json({
       data: updatedClient,
@@ -170,6 +182,8 @@ const updateClient = async (
     });
   } catch (error) {
     return next(createHttpError(500, "Error while updating client"));
+  } finally {
+    if (filePath) await unlinkSafe(filePath);
   }
 };
 
@@ -178,8 +192,8 @@ const deleteClient = async (
   res: Response,
   next: NextFunction
 ) => {
-  const clientId = req.params.clientId;
-  const client = await clientModel.findOne({ _id: clientId });
+  const { clientId } = req.params;
+  const client = await clientModel.findById(clientId).lean();
   if (!client) {
     return next(createHttpError(404, "Client not found"));
   }
@@ -187,12 +201,13 @@ const deleteClient = async (
   const clientLogoSplits = client.clientLogo.split("/");
   const lastPart = clientLogoSplits[clientLogoSplits.length - 1];
   const folderPart = clientLogoSplits[clientLogoSplits.length - 2];
-  const clientLogoPublicId =
-    folderPart + "/" + lastPart.split(".")[0];
+  const clientLogoPublicId = `${folderPart}/${lastPart.split(".")[0]}`;
 
   try {
-    await cloudinary.uploader.destroy(clientLogoPublicId);
-    await clientModel.deleteOne({ _id: clientId });
+    await Promise.all([
+      cloudinary.uploader.destroy(clientLogoPublicId),
+      clientModel.deleteOne({ _id: clientId }),
+    ]);
     res.sendStatus(204);
   } catch (error) {
     return next(createHttpError(500, "Error while deleting client"));

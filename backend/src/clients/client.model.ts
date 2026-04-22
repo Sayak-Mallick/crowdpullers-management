@@ -1,11 +1,12 @@
 import mongoose from "mongoose";
 import { Client } from "./client.types";
 
-const clientModel = new mongoose.Schema<Client>(
+const clientSchema = new mongoose.Schema<Client>(
   {
     name: {
       type: String,
       required: true,
+      trim: true,
     },
     clientLogo: {
       type: String,
@@ -15,4 +16,7 @@ const clientModel = new mongoose.Schema<Client>(
   { timestamps: true }
 );
 
-export default mongoose.model<Client>("Client", clientModel);
+// Index so sorted reads (find + sort by createdAt) hit the index, not a full scan
+clientSchema.index({ createdAt: -1 });
+
+export default mongoose.model<Client>("Client", clientSchema);
