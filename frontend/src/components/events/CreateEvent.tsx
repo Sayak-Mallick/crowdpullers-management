@@ -59,6 +59,8 @@ const CATEGORIES = [
   "Hackathon",
   "Seminar",
   "Networking",
+  "Celebration",
+  "Workshop",
   "Other",
 ];
 
